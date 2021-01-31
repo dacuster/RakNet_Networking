@@ -1,0 +1,15 @@
+{
+    "name": "RakNet.Server",
+    "references": [
+        "GUID:b895314d09c12694986dc8cab36758ec"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
