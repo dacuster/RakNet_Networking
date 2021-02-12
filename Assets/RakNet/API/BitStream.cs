@@ -32,10 +32,16 @@ public unsafe class BitStream_Native
     public static extern void BitStream_SetWriteOffset(IntPtr bitstream_pointer, uint offset);
 
     [DllImport(DLL_NAME)]
+    public static extern uint BitStream_GetWriteOffset(IntPtr bitstream_pointer);
+
+    [DllImport(DLL_NAME)]
     public static extern void BitStream_ResetReadPointer(IntPtr bitstream_pointer);
 
     [DllImport(DLL_NAME)]
     public static extern void BitStream_SetReadOffset(IntPtr bitstream_pointer, uint offset);
+
+    [DllImport(DLL_NAME)]
+    public static extern uint BitStream_GetReadOffset(IntPtr bitstream_pointer);
 
     [DllImport(DLL_NAME)]
     public static extern void BitStream_Reset(IntPtr bitstream_pointer);
@@ -267,6 +273,14 @@ public class BitStream : IDisposable
         BitStream_Native.BitStream_SetWriteOffset(pointer, offset);
     }
 
+    public uint GetWritePointer()
+    {
+        if (pointer == IntPtr.Zero)
+            return 0;
+
+        return BitStream_Native.BitStream_GetWriteOffset(pointer);
+    }
+
     public void ResetReadPointer()
     {
         if (pointer == IntPtr.Zero)
@@ -281,6 +295,14 @@ public class BitStream : IDisposable
             return;
 
         BitStream_Native.BitStream_SetReadOffset(pointer, offset);
+    }
+
+    public uint GetReadPointer()
+    {
+        if (pointer == IntPtr.Zero)
+            return 0;
+
+        return BitStream_Native.BitStream_GetReadOffset(pointer);
     }
 
     public void IgnoreBytes(int numberOfBytes)
