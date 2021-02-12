@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 using System.Text;
 using UnityEngine;
@@ -192,6 +192,11 @@ public class BitStream : IDisposable
         Reset();
     }
 
+    public bool Exist()
+    {
+        return pointer != IntPtr.Zero;
+    }
+
     internal BitStream(IntPtr packet_ptr)
     {
         pointer = BitStream_Native.BitStream_Create2(packet_ptr);
@@ -200,29 +205,38 @@ public class BitStream : IDisposable
     internal void ReadPacket(IntPtr packet_ptr)
     {
         if (pointer == IntPtr.Zero || packet_ptr == IntPtr.Zero)
+        {
             return;
+        }
 
         BitStream_Native.BitStream_ReadPacket(pointer, packet_ptr);
     }
 
     #region Disposing
-    private bool disposed = false;
-    protected void Dispose(bool disposing)
+    private void Dispose(bool disposing)
     {
-        if (!disposed)
+        if (!this.disposed)
         {
             if (disposing)
             {
+                Dispose();
+            }
+            lock (this)
+            {
                 Close();
             }
-            disposed = true;
         }
+        disposed = true;
     }
+
+    bool disposed = true;
+
     public void Dispose()
     {
         Dispose(true);
         GC.SuppressFinalize(this);
     }
+
     ~BitStream()
     {
         Dispose(false);
@@ -231,36 +245,57 @@ public class BitStream : IDisposable
 
     public void Close()
     {
+        if (pointer == IntPtr.Zero)
+            return;
+
         BitStream_Native.BitStream_Close(pointer);
     }
 
     public void ResetWritePointer()
     {
+        if (pointer == IntPtr.Zero)
+            return;
+
         BitStream_Native.BitStream_ResetWritePointer(pointer);
     }
 
     public void SetWritePointer(uint offset)
     {
+        if (pointer == IntPtr.Zero)
+            return;
+
         BitStream_Native.BitStream_SetWriteOffset(pointer, offset);
     }
 
     public void ResetReadPointer()
     {
+        if (pointer == IntPtr.Zero)
+            return;
+
         BitStream_Native.BitStream_ResetReadPointer(pointer);
     }
 
     public void SetReadPointer(uint offset)
     {
+        if (pointer == IntPtr.Zero)
+            return;
+
         BitStream_Native.BitStream_SetReadOffset(pointer, offset);
     }
 
     public void IgnoreBytes(int numberOfBytes)
     {
+        if (pointer == IntPtr.Zero)
+            return;
+
         BitStream_Native.BitStream_IgnoreBytes(pointer, numberOfBytes);
     }
 
     public void Reset()
     {
+        if (pointer == IntPtr.Zero)
+            return;
+
         BitStream_Native.BitStream_Reset(pointer);
     }
 
@@ -276,6 +311,9 @@ public class BitStream : IDisposable
 
     public void SetData(byte[] data)
     {
+        if (pointer == IntPtr.Zero)
+            return;
+
         BitStream_Native.BitStream_SetData(pointer, data, data.Length);
     }
 
@@ -311,18 +349,30 @@ public class BitStream : IDisposable
 
     public void Write(sbyte value)
     {
+        if (pointer == IntPtr.Zero)
+            return;
+
         Write((byte)value);
     }
     public void WriteDelta(sbyte value, sbyte last_value)
     {
+        if (pointer == IntPtr.Zero)
+            return;
+
         WriteDelta((byte)value, (byte)last_value);
     }
     public void WriteCompressed(sbyte value)
     {
+        if (pointer == IntPtr.Zero)
+            return;
+
         WriteCompressed((byte)value);
     }
     public void WriteCompressedDelta(sbyte value, sbyte last_value)
     {
+        if (pointer == IntPtr.Zero)
+            return;
+
         WriteCompressedDelta((byte)value, (byte)last_value);
     }
     public void Write(bool value)
@@ -361,18 +411,30 @@ public class BitStream : IDisposable
 
     public void Write(ushort value)
     {
+        if (pointer == IntPtr.Zero)
+            return;
+
         Write((short)value);
     }
     public void WriteDelta(ushort value, ushort last_value)
     {
+        if (pointer == IntPtr.Zero)
+            return;
+
         WriteDelta((short)value, (short)last_value);
     }
     public void WriteCompressed(ushort value)
     {
+        if (pointer == IntPtr.Zero)
+            return;
+
         WriteCompressed((short)value);
     }
     public void WriteCompressedDelta(ushort value, ushort last_value)
     {
+        if (pointer == IntPtr.Zero)
+            return;
+
         WriteCompressedDelta((short)value, (short)last_value);
     }
 
@@ -407,18 +469,30 @@ public class BitStream : IDisposable
 
     public void Write(uint value)
     {
+        if (pointer == IntPtr.Zero)
+            return;
+
         Write((int)value);
     }
     public void WriteDelta(uint value, uint last_value)
     {
+        if (pointer == IntPtr.Zero)
+            return;
+
         WriteDelta((int)value, (int)last_value);
     }
     public void WriteCompressed(uint value)
     {
+        if (pointer == IntPtr.Zero)
+            return;
+
         WriteCompressed((int)value);
     }
     public void WriteCompressedDelta(uint value, uint last_value)
     {
+        if (pointer == IntPtr.Zero)
+            return;
+
         WriteCompressedDelta((int)value, (int)last_value);
     }
 
@@ -490,18 +564,30 @@ public class BitStream : IDisposable
 
     public void Write(ulong value)
     {
+        if (pointer == IntPtr.Zero)
+            return;
+
         Write((long)value);
     }
     public void WriteDelta(ulong value, ulong last_value)
     {
+        if (pointer == IntPtr.Zero)
+            return;
+
         WriteDelta((long)value, (long)last_value);
     }
     public void WriteCompressed(ulong value)
     {
+        if (pointer == IntPtr.Zero)
+            return;
+
         WriteCompressed((long)value);
     }
     public void WriteCompressedDelta(ulong value, ulong last_value)
     {
+        if (pointer == IntPtr.Zero)
+            return;
+
         WriteCompressedDelta((long)value, (long)last_value);
     }
 
