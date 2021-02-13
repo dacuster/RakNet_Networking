@@ -56,7 +56,6 @@ public class SampleClient : BaseClient
     public override void OnShutdown()
     {
         Debug.LogWarning("[Client] Shutdown");
-        client_bitStream?.Close();
     }
 
     public override void OnSerializeData(BitStream bitStream, int packet_size)
