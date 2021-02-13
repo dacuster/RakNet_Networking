@@ -218,38 +218,23 @@ public class BitStream : IDisposable
         BitStream_Native.BitStream_ReadPacket(pointer, packet_ptr);
     }
 
-    #region Disposing
-    private void Dispose(bool disposing)
-    {
-        if (!this.disposed)
-        {
-            if (disposing)
-            {
-                Dispose();
-            }
-            lock (this)
-            {
-                Close();
-            }
-        }
-        disposed = true;
-    }
-
-    bool disposed = true;
-
+     #region Disposing
     public void Dispose()
     {
-        Dispose(true);
-        GC.SuppressFinalize(this);
+        lock (this)
+        {
+            Close();
+            GC.SuppressFinalize(this);
+        }
     }
 
     ~BitStream()
     {
-        Dispose(false);
+        Dispose();
     }
     #endregion
 
-    public void Close()
+    internal void Close()
     {
         if (pointer == IntPtr.Zero)
             return;
