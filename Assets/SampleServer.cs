@@ -128,6 +128,5 @@ public class SampleServer : BaseServer
     public override void OnShutdown()
     {
         Debug.LogWarning("[Server] Shutdown");
-        server_bitStream?.Close();
     }
 }
