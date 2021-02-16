@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 using System.Text;
 using UnityEngine;
@@ -214,11 +214,10 @@ public class BitStream : IDisposable
         {
             return;
         }
-
         BitStream_Native.BitStream_ReadPacket(pointer, packet_ptr);
     }
 
-     #region Disposing
+    #region Disposing
     public void Dispose()
     {
         lock (this)
@@ -633,7 +632,7 @@ public class BitStream : IDisposable
         }
         else
         {
-            float m = Mathf.Sqrt((value.x * value.x) + (value.y * value.y) + (value.z * value.z));
+            float m = value.magnitude;
             Write(m);
             WriteCompressed(value.x / m);
             WriteCompressed(value.y / m);
@@ -961,14 +960,13 @@ public class BitStream : IDisposable
         }
     }
 
-
     /* ARRAYS */
 
     //BYTE[]
     public void WriteArray(byte[] array)
     {
         Write((short)array.Length);
-        for(int i = 0;i < array.Length; i++)
+        for (int i = 0; i < array.Length; i++)
         {
             Write(array[i]);
         }
@@ -1024,5 +1022,4 @@ public class BitStream : IDisposable
 
         return array;
     }
-
 }

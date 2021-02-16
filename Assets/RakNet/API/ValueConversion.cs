@@ -50,4 +50,10 @@ public static class ValueConversion
 
         return (int)union.floatValue;
     }
+
+    public static string GetAddress(this int address_int)
+    {
+        return (address_int & 0xFF) + "." + ((address_int >> 8) & 0xFF) + "." + ((address_int >> 16) & 0xFF) + "." + ((address_int >> 24) & 0xFF);
+
+    }
 }
