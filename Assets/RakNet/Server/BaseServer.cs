@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Net.Sockets;
+using System.Text;
+using UnityEngine;
 
 /// <summary>
 /// The base class of the server with basic functionality
@@ -82,6 +84,11 @@ public class BaseServer : MonoBehaviour
     public void SetPassword(string password)
     {
         peer.SetPassword(password);
+    }
+
+    public bool HasPassword()
+    {
+        return peer.HasPassword();
     }
 
     private void Awake()
@@ -235,6 +242,47 @@ public class BaseServer : MonoBehaviour
         peer.SendToAllIgnore(stream, ignore_guid, priority, reliability, channel);
     }
 
+    /// <summary>
+    /// Allow clients to query information about the server?
+    /// </summary>
+    public void AllowQuery(bool enabled)
+    {
+        if (!peer.IsActive())
+            return;
+
+        peer.AllowQuery(enabled);
+    }
+
+    /// <summary>
+    /// Are clients allowed to query information?
+    /// </summary>
+    /// <returns></returns>
+    public bool IsQueryAllowed()
+    {
+        if (!peer.IsActive())
+            return false;
+
+        return peer.IsQueryAllowed();
+    }
+
+    /// <summary>
+    /// Set data to send to the requesting client as an array of bytes (MAX SIZE: 8 kb)
+    /// </summary>
+    public void SetQueryResponce(byte[] data)
+    {
+        if (!peer.IsActive())
+            return;
+
+        peer.SetQueryResponce(data);
+    }
+
+    /// <summary>
+    /// The average ping between the server and the client
+    /// </summary>
+    public string GetAddress(ulong guid, bool with_port = false)
+    {
+        return peer.GetAddress(guid, with_port);
+    }
 
     /// <summary>
     /// The average ping between the server and the client
