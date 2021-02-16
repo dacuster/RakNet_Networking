@@ -15,6 +15,9 @@ public unsafe class RakPeer_Native
     public static extern IntPtr NET_Create();
 
     [DllImport(DLL_NAME)]
+    public static extern StartupResult NET_Startup(IntPtr instance_ptr);
+
+    [DllImport(DLL_NAME)]
     public static extern void NET_Destroy(IntPtr instance_ptr);
 
     [DllImport(DLL_NAME)]
@@ -28,6 +31,9 @@ public unsafe class RakPeer_Native
 
     [DllImport(DLL_NAME)]
     public static extern void NET_SetPassword(IntPtr instance_ptr, string password);
+
+    [DllImport(DLL_NAME)]
+    public static extern bool NET_HasPassword(IntPtr instance_ptr);
 
     [DllImport(DLL_NAME)]
     public static extern ConnectionAttemptResult NET_StartClient(IntPtr instance_ptr, string address, ushort port, string password = "", short attempts = 3);
@@ -105,10 +111,22 @@ public unsafe class RakPeer_Native
     public static extern bool NETSND_ToClient(IntPtr instance_ptr, IntPtr bistream_ptr, ulong guid, PacketPriority priority, PacketReliability reliablitity, int channel);
 
     [DllImport(DLL_NAME)]
+    public static extern void NETSND_ToAddress(IntPtr instance_ptr, byte[] data, int length, string target_address, ushort target_port);
+
+    [DllImport(DLL_NAME)]
     public static extern bool NETSND_ToAll(IntPtr instance_ptr, IntPtr bistream_ptr, PacketPriority priority, PacketReliability reliablitity, int channel);
 
     [DllImport(DLL_NAME)]
     public static extern bool NETSND_ToAllIgnore(IntPtr instance_ptr, ulong ignore_guid, IntPtr bistream_ptr, PacketPriority priority, PacketReliability reliablitity, int channel);
+
+    [DllImport(DLL_NAME)]
+    public static extern void NET_AllowQuery(IntPtr instance_ptr, bool enabled);
+
+    [DllImport(DLL_NAME)]
+    public static extern bool NET_IsQueryAllowed(IntPtr instance_ptr);
+
+    [DllImport(DLL_NAME)]
+    public static extern void NET_SetQueryResponce(IntPtr instance_ptr, byte[] data);
 
     [DllImport(DLL_NAME)]
     public static extern ulong NET_GetStatisticsLastSeconds(IntPtr instance_ptr, uint index, RNSPerSecondMetrics metrics);
@@ -121,13 +139,17 @@ public unsafe class RakPeer_Native
 
     [DllImport(DLL_NAME)]
     public static extern ConnectionState NET_ConnectionState(IntPtr instance_ptr, ulong guid);
-	
-	/* PLUGINS FEATURE */
-	
-	[DllImport(DLL_NAME)]
+
+    [DllImport(DLL_NAME)]
+    public static extern bool NET_Ping(IntPtr instance_ptr, string address, ushort port, bool onlyReplyOnAcceptingConnections = false);
+
+
+    /* PLUGINS FEATURE */
+
+    [DllImport(DLL_NAME)]
     public static extern void NET_AttachPlugin(IntPtr instance_ptr, IntPtr plugin_ptr);
-	
-	[DllImport(DLL_NAME)]
+
+    [DllImport(DLL_NAME)]
     public static extern void NET_DetachPlugin(IntPtr instance_ptr, IntPtr plugin_ptr);
 }
 
@@ -186,6 +208,11 @@ public class RakPeer : IDisposable
         }
     }
 
+    public StartupResult Startup()
+    {
+        return RakPeer_Native.NET_Startup(pointer);
+    }
+
     StartupResult StartupResult;
 
     public StartupResult StartServer(string address, ushort port, ushort max_connections = 32)
@@ -195,7 +222,6 @@ public class RakPeer : IDisposable
         if (StartupResult == StartupResult.RAKNET_STARTED)
         {
             Type = PeerType.Server;
-            bitStream = new BitStream();
             is_shutteddown = false;
         }
 
@@ -212,6 +238,11 @@ public class RakPeer : IDisposable
         RakPeer_Native.NET_SetPassword(pointer, password);
     }
 
+    public bool HasPassword()
+    {
+        return RakPeer_Native.NET_HasPassword(pointer);
+    }
+
     ConnectionAttemptResult ConnectionAttemptResult;
 
     public ConnectionAttemptResult StartClient(string address, ushort port, string password = "", short attempts = 10)
@@ -221,7 +252,6 @@ public class RakPeer : IDisposable
         if (ConnectionAttemptResult == ConnectionAttemptResult.CONNECTION_ATTEMPT_STARTED)
         {
             Type = PeerType.Client;
-            bitStream = new BitStream();
             is_shutteddown = false;
         }
 
@@ -237,7 +267,6 @@ public class RakPeer : IDisposable
             return;
 
         is_shutteddown = true;
-        bitStream?.Close();
         RakPeer_Native.NET_Shutdown(pointer);
     }
 
@@ -296,10 +325,16 @@ public class RakPeer : IDisposable
 
     public bool IsActive()
     {
+
+        if (pointer == IntPtr.Zero)
+        {
+            return false;
+        }
+
         return RakPeer_Native.NET_IsActive(pointer);
     }
 
-    BitStream bitStream = null;
+    BitStream bitStream = new BitStream();
 
     public bool HasReceived(out BitStream _bitStream, out ulong guid, out int packet_size)
     {
@@ -310,15 +345,15 @@ public class RakPeer : IDisposable
         if (RakPeer_Native.NET_Receive(pointer))
         {
             packet_ptr = RakPeer_Native.NET_Packet(pointer, ref guid, ref packet_size);
-            if (packet_ptr != IntPtr.Zero)
+            if (packet_ptr != IntPtr.Zero && _bitStream != null && _bitStream.pointer != IntPtr.Zero)
             {
                 _bitStream.ReadPacket(packet_ptr);
-				return true;
+                return true;
             }
-			else
-			{
-				return false;
-			}
+            else
+            {
+                return false;
+            }
         }
         return false;
     }
@@ -329,6 +364,14 @@ public class RakPeer : IDisposable
             return 0;
 
         return RakPeer_Native.NET_ReceiveCount(pointer);
+    }
+
+    public void SendToAddress(byte[] data, string target_address, ushort target_port)
+    {
+        if (pointer != IntPtr.Zero)
+        {
+            RakPeer_Native.NETSND_ToAddress(pointer, data, data.Length, target_address, target_port);
+        }
     }
 
     public void SendToClient(BitStream stream, ulong guid, PacketPriority priority = PacketPriority.IMMEDIATE_PRIORITY, PacketReliability reliability = PacketReliability.RELIABLE, byte channel = 0)
@@ -352,6 +395,32 @@ public class RakPeer : IDisposable
         if (pointer != IntPtr.Zero && stream != null && stream.pointer != IntPtr.Zero)
         {
             RakPeer_Native.NETSND_ToAllIgnore(pointer, ignore_guid, stream.pointer, priority, reliability, channel);
+        }
+    }
+
+    public void AllowQuery(bool enabled)
+    {
+        if(pointer != IntPtr.Zero)
+        {
+            RakPeer_Native.NET_AllowQuery(pointer, enabled);
+        }
+    }
+
+    public bool IsQueryAllowed()
+    {
+        if (pointer != IntPtr.Zero)
+        {
+            return RakPeer_Native.NET_IsQueryAllowed(pointer);
+        }
+
+        return false;
+    }
+
+    public void SetQueryResponce(byte[] data)
+    {
+        if (pointer != IntPtr.Zero)
+        {
+            RakPeer_Native.NET_SetQueryResponce(pointer, data);
         }
     }
 
@@ -424,5 +493,19 @@ public class RakPeer : IDisposable
     public ConnectionState GetConnectionState(ulong guid)
     {
         return RakPeer_Native.NET_ConnectionState(pointer, guid);
+    }
+
+    public bool Ping(string address, ushort port, bool onlyReplyOnAcceptingConnections = false)
+    {
+        StartupResult result = Startup();
+
+        if (result == StartupResult.RAKNET_STARTED || result == StartupResult.RAKNET_ALREADY_STARTED)
+        {
+            return RakPeer_Native.NET_Ping(pointer, address, port, onlyReplyOnAcceptingConnections);
+        }
+        else
+        {
+            return false;
+        }
     }
 }
