@@ -28,7 +28,7 @@ See SampleClient.cs and SampleServer.cs
 ## Set Query Responce on server-side
 > To specify the data for the response call BaseServer.SetQueryResponce(byte[] data) (***It is recommended to call at intervals of 2-3 seconds***)
 
-> To disable query processing, call Base Server.AllowQuery(false);
+> To disable query processing, call BaseServer.AllowQuery(false);
 
 # Attention!
 ### This version of the network engine is not compatible with others!
