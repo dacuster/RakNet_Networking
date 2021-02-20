@@ -1,4 +1,4 @@
-﻿using System.Net.Sockets;
+using System.Net.Sockets;
 using System.Text;
 using UnityEngine;
 
@@ -31,9 +31,15 @@ public class BaseServer : MonoBehaviour
     /// <summary>
     /// Server start with address and port binding, password and maximum number of connections
     /// </summary>
-    public StartupResult StartServer(string address, ushort port, string password = "", ushort max_connections = 10)
+    /// <param name="address">bind server to ip</param>
+    /// <param name="port">bind server to port</param>
+    /// <param name="password">connection password</param>
+    /// <param name="max_connections">maximum clients</param>
+    /// <param name="insecure">if true, the server will not use security features (encryption, etc.), it is recommended to set true to prevent packet interception</param>
+    /// <returns></returns>
+    public StartupResult StartServer(string address, ushort port, string password = "", ushort max_connections = 10, bool insecure = false)
     {
-        StartupResult result = peer.StartServer(address, port, max_connections);
+        StartupResult result = peer.StartServer(address, port, max_connections, insecure);
 
         if (result == StartupResult.RAKNET_STARTED)
         {
@@ -266,13 +272,10 @@ public class BaseServer : MonoBehaviour
     }
 
     /// <summary>
-    /// Set data to send to the requesting client as an array of bytes (MAX SIZE: 8 kb)
+    /// Set data to send to the requesting client as an array of bytes
     /// </summary>
     public void SetQueryResponce(byte[] data)
     {
-        if (!peer.IsActive())
-            return;
-
         peer.SetQueryResponce(data);
     }
 
