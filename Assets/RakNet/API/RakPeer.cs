@@ -1,6 +1,5 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
-using UnityEngine;
 using static RakNetDLL;
 
 /// <summary>
@@ -24,7 +23,7 @@ public unsafe class RakPeer_Native
     public static extern void NET_Shutdown(IntPtr instance_ptr);
 
     [DllImport(DLL_NAME)]
-    public static extern StartupResult NET_StartServer(IntPtr instance_ptr, string address, ushort port, ushort max_connections = 32);
+    public static extern StartupResult NET_StartServer(IntPtr instance_ptr, string address, ushort port, ushort max_connections = 32, bool insecure = false);
 
     [DllImport(DLL_NAME)]
     public static extern void NET_SetMaxConnections(IntPtr instance_ptr, ushort max_connections);
@@ -215,9 +214,9 @@ public class RakPeer : IDisposable
 
     StartupResult StartupResult;
 
-    public StartupResult StartServer(string address, ushort port, ushort max_connections = 32)
+    public StartupResult StartServer(string address, ushort port, ushort max_connections = 32, bool insecure = false)
     {
-        StartupResult = RakPeer_Native.NET_StartServer(pointer, address, port, max_connections);
+        StartupResult = RakPeer_Native.NET_StartServer(pointer, address, port, max_connections, insecure);
 
         if (StartupResult == StartupResult.RAKNET_STARTED)
         {
