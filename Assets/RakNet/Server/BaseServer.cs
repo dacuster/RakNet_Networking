@@ -35,7 +35,7 @@ public class BaseServer : MonoBehaviour
     /// <param name="port">bind server to port</param>
     /// <param name="password">connection password</param>
     /// <param name="max_connections">maximum clients</param>
-    /// <param name="insecure">if true, the server will not use security features (encryption, etc.), it is recommended to set true to prevent packet interception</param>
+    /// <param name="insecure">if true, the server will not use security features (encryption, etc.), it is recommended to set false to prevent packet interception</param>
     /// <returns></returns>
     public StartupResult StartServer(string address, ushort port, string password = "", ushort max_connections = 10, bool insecure = false)
     {
