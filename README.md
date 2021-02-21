@@ -7,13 +7,13 @@ See SampleClient.cs and SampleServer.cs
 
 # What's new?
 - Updated and optimized native (C++) code
-- Added: Bitstream ( ***Write/read data with a simple and reliable tool, supports compression, delta compression )
-- Added: Password for the server ( ***Restrict connections to the server with a password )
-- Added: Data encryption ( ***Strong data encryption, you don't need to worry about connection security... You can disable it if you decide to use your own encryption )
-- Added: Setting bandwidth limit ( ***Bandwidth limit for each connection)
-- Added: Getting specific statistics data ( ***Getting the amount of data sent/received, transfer rate, ping, loss, etc. )
-- Added: Query Features ( ***Request server data using the UDP protocol used in any programming languages that support it )
-- Added: Anti-DDos ( ***Restriction of connection from same address for some time )
+- Added: Bitstream ( ***Write/read data with a simple and reliable tool, supports compression, delta compression*** )
+- Added: Password for the server ( ***Restrict connections to the server with a password*** )
+- Added: Data encryption ( ***Strong data encryption, you don't need to worry about connection security... You can disable it if you decide to use your own encryption*** )
+- Added: Setting bandwidth limit ( ***Bandwidth limit for each connection***)
+- Added: Getting specific statistics data ( ***Getting the amount of data sent/received, transfer rate, ping, loss, etc.*** )
+- Added: Query Features ( ***Request server data using the UDP protocol used in any programming languages that support it*** )
+- Added: Anti-DDos ( ***Restriction of connection from same address for some time*** )
 
 # Query
 ## Quering data from server
