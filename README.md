@@ -17,7 +17,7 @@ See SampleClient.cs and SampleServer.cs
 - Added: Query Features ( ***Request server data using the UDP protocol used in any programming languages that support it*** )
 - Added: Anti-DDos ( ***Restriction of connection from same address for some time*** )
 
-# Writing your own client / Server
+# Writing own Client/Server
 >You can use and modify the base scripts for yourself by adding your own logic, but I strongly recommend inheriting from the base classes (BaseClient, BaseServer, BitStream) and overriding the virtual methods in your classes. Examples of inheritance and redefinition can be [found here](https://github.com/ep1s0de3/RakNet_Networking_2/blob/main/Assets/SampleClient.cs) and [here](https://github.com/ep1s0de3/RakNet_Networking_2/blob/main/Assets/SampleServer.cs)
 
 # Query
