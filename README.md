@@ -1,7 +1,7 @@
 ![Alt-текст](https://raw.githubusercontent.com/ep1s0de3/RakNet_Networking_2/main/raknet.jpg "Ох ебать!")
 This is an re-writted version of the wrapper for the native library of the RakNet network engine.
 
-[https://t.me/uraknet](Telegram)
+[Telegram](https://t.me/uraknet)
 
 # How to use it
 In order to use The raknet network engine in your project, I recommend that you study the test client and server.
