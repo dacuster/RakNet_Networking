@@ -2,8 +2,6 @@
 
 public class SampleClient : BaseClient
 {
-    public BitStream client_bitStream = new BitStream();
-
     public string username = "Player";
     public string address = "127.0.0.1";
     public ushort port = 7777;
@@ -41,11 +39,15 @@ public class SampleClient : BaseClient
     {
         Debug.LogWarning("[Client] Connected to server");
 
-        client_bitStream.Reset();
-        client_bitStream.Write((byte)CustomIDs.CLIENT_DATA);
-        client_bitStream.Write(username);
+        //example using poolable bitStream
+		using (PooledBitStream bitStream = BitStreamPool.GetBitStream())
+        {
+			bitStream.Reset();
+			bitStream.Write((byte)CustomIDs.CLIENT_DATA);
+			bitStream.Write(username);
 
-        SendToServer(client_bitStream, PacketPriority.IMMEDIATE_PRIORITY, PacketReliability.RELIABLE, 0);
+			SendToServer(bitStream, PacketPriority.IMMEDIATE_PRIORITY, PacketReliability.RELIABLE, 0);
+        }
     }
 
     public override void OnDisconnected(DisconnectReason reason)
