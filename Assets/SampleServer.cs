@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 
 public struct ClientData
@@ -15,8 +15,6 @@ public struct ClientData
 
 public class SampleServer : BaseServer
 {
-    public BitStream server_bitStream = new BitStream();
-
     public ushort port = 7777;
     public string password = string.Empty;
     public ushort max_connections = 10;
@@ -84,19 +82,20 @@ public class SampleServer : BaseServer
                 Clients.Add(guid, new ClientData(guid, bitStream.ReadString()));
 
                 /* we inform the client that his data is accepted, we send it via a reliable channel */
+				using (PooledBitStream bitStream = BitStreamPool.GetBitStream())
+                {
+					//be sure to reset the bitstream! If you do not do this the old recorded data will be sent
+					bitStream.Reset();
 
-                //be sure to reset the bitstream! If you do not do this the old recorded data will be sent
-                server_bitStream.Reset();
+					//Write the packet id as a byte so that the client knows how to process the packet
+					bitStream.Write((byte)CustomIDs.CLIENT_DATA_ACCEPTED);
 
-                //Write the packet id as a byte so that the client knows how to process the packet
-                server_bitStream.Write((byte)CustomIDs.CLIENT_DATA_ACCEPTED);
+					//As an example, we will send the text to the client in the load
+					bitStream.Write("RakNet top... SosiPisos");
 
-                //As an example, we will send the text to the client in the load
-                server_bitStream.Write("RakNet top... SosiPisos");
-
-                //we send data from bitstream to the client using its unique guid
-                SendToClient(server_bitStream, guid, PacketPriority.IMMEDIATE_PRIORITY, PacketReliability.RELIABLE, 0);
-
+					//we send data from bitstream to the client using its unique guid
+					SendToClient(bitStream, guid, PacketPriority.IMMEDIATE_PRIORITY, PacketReliability.RELIABLE, 0);
+				}
                 break;
         }
     }
