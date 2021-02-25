@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 using static RakNetDLL;
 
@@ -104,19 +104,19 @@ public unsafe class RakPeer_Native
     public static extern void NET_CloseConnection(IntPtr instance_ptr, ulong guid, bool send_disconnection_notification = true);
 
     [DllImport(DLL_NAME)]
-    public static extern bool NETSND_ToServer(IntPtr instance_ptr, IntPtr bistream_ptr, PacketPriority priority, PacketReliability reliablitity, int channel);
+    public static extern byte NETSND_ToServer(IntPtr instance_ptr, IntPtr bitstream_ptr, PacketPriority priority, PacketReliability reliablitity, int channel);
 
     [DllImport(DLL_NAME)]
-    public static extern bool NETSND_ToClient(IntPtr instance_ptr, IntPtr bistream_ptr, ulong guid, PacketPriority priority, PacketReliability reliablitity, int channel);
+    public static extern byte NETSND_ToClient(IntPtr instance_ptr, IntPtr bitstream_ptr, ulong guid, PacketPriority priority, PacketReliability reliablitity, int channel);
 
     [DllImport(DLL_NAME)]
     public static extern void NETSND_ToAddress(IntPtr instance_ptr, byte[] data, int length, string target_address, ushort target_port);
 
     [DllImport(DLL_NAME)]
-    public static extern bool NETSND_ToAll(IntPtr instance_ptr, IntPtr bistream_ptr, PacketPriority priority, PacketReliability reliablitity, int channel);
+    public static extern byte NETSND_ToAll(IntPtr instance_ptr, IntPtr bitstream_ptr, PacketPriority priority, PacketReliability reliablitity, int channel);
 
     [DllImport(DLL_NAME)]
-    public static extern bool NETSND_ToAllIgnore(IntPtr instance_ptr, ulong ignore_guid, IntPtr bistream_ptr, PacketPriority priority, PacketReliability reliablitity, int channel);
+    public static extern byte NETSND_ToAllIgnore(IntPtr instance_ptr, ulong ignore_guid, IntPtr bistream_ptr, PacketPriority priority, PacketReliability reliablitity, int channel);
 
     [DllImport(DLL_NAME)]
     public static extern void NET_AllowQuery(IntPtr instance_ptr, bool enabled);
@@ -373,33 +373,36 @@ public class RakPeer : IDisposable
         }
     }
 
-    public void SendToClient(BitStream stream, ulong guid, PacketPriority priority = PacketPriority.IMMEDIATE_PRIORITY, PacketReliability reliability = PacketReliability.RELIABLE, byte channel = 0)
+    public byte SendToClient(BitStream stream, ulong guid, PacketPriority priority = PacketPriority.IMMEDIATE_PRIORITY, PacketReliability reliability = PacketReliability.RELIABLE, byte channel = 0)
     {
         if (pointer != IntPtr.Zero && stream != null && stream.pointer != IntPtr.Zero)
         {
-            RakPeer_Native.NETSND_ToClient(pointer, stream.pointer, guid, priority, reliability, channel);
+            return RakPeer_Native.NETSND_ToClient(pointer, stream.pointer, guid, priority, reliability, channel);
         }
+        return 0;
     }
 
-    public void SendToAll(BitStream stream, PacketPriority priority = PacketPriority.IMMEDIATE_PRIORITY, PacketReliability reliability = PacketReliability.RELIABLE, byte channel = 0)
+    public byte SendToAll(BitStream stream, PacketPriority priority = PacketPriority.IMMEDIATE_PRIORITY, PacketReliability reliability = PacketReliability.RELIABLE, byte channel = 0)
     {
         if (pointer != IntPtr.Zero && stream != null && stream.pointer != IntPtr.Zero)
         {
-            RakPeer_Native.NETSND_ToAll(pointer, stream.pointer, priority, reliability, channel);
+            return RakPeer_Native.NETSND_ToAll(pointer, stream.pointer, priority, reliability, channel);
         }
+        return 0;
     }
 
-    public void SendToAllIgnore(BitStream stream, ulong ignore_guid, PacketPriority priority = PacketPriority.IMMEDIATE_PRIORITY, PacketReliability reliability = PacketReliability.RELIABLE, byte channel = 0)
+    public byte SendToAllIgnore(BitStream stream, ulong ignore_guid, PacketPriority priority = PacketPriority.IMMEDIATE_PRIORITY, PacketReliability reliability = PacketReliability.RELIABLE, byte channel = 0)
     {
         if (pointer != IntPtr.Zero && stream != null && stream.pointer != IntPtr.Zero)
         {
-            RakPeer_Native.NETSND_ToAllIgnore(pointer, ignore_guid, stream.pointer, priority, reliability, channel);
+            return RakPeer_Native.NETSND_ToAllIgnore(pointer, ignore_guid, stream.pointer, priority, reliability, channel);
         }
+        return 0;
     }
 
     public void AllowQuery(bool enabled)
     {
-        if(pointer != IntPtr.Zero)
+        if (pointer != IntPtr.Zero)
         {
             RakPeer_Native.NET_AllowQuery(pointer, enabled);
         }
@@ -423,12 +426,13 @@ public class RakPeer : IDisposable
         }
     }
 
-    public void SendToServer(BitStream stream, PacketPriority priority = PacketPriority.IMMEDIATE_PRIORITY, PacketReliability reliability = PacketReliability.RELIABLE, byte channel = 0)
+    public byte SendToServer(BitStream stream, PacketPriority priority = PacketPriority.IMMEDIATE_PRIORITY, PacketReliability reliability = PacketReliability.RELIABLE, byte channel = 0)
     {
         if (pointer != IntPtr.Zero && stream != null && stream.pointer != IntPtr.Zero)
         {
-            RakPeer_Native.NETSND_ToServer(pointer, stream.pointer, priority, reliability, channel);
+            return RakPeer_Native.NETSND_ToServer(pointer, stream.pointer, priority, reliability, channel);
         }
+        return 0;
     }
 
     public ulong GetMyGUID()

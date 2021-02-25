@@ -218,7 +218,7 @@ public class BitStream : IDisposable
     }
 
     #region Disposing
-    public void Dispose()
+    public virtual void Dispose()
     {
         lock (this)
         {
