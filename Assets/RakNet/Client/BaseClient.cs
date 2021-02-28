@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 /// <summary>
 /// Basic client class with basic functionality
@@ -8,7 +7,7 @@ using UnityEngine;
 public class BaseClient : MonoBehaviour
 {
     protected RakPeer peer = null;
-    
+
     public bool IsConnecting { get; private set; } = false;
     public bool IsConnected { get; private set; } = false;
 
@@ -20,11 +19,19 @@ public class BaseClient : MonoBehaviour
         if (peer == null)
         {
             peer = new RakPeer();
+        }
+        if (peer != null && peer.Exists())
+        {
             OnInitialized();
         }
     }
 
-    private void Destroy()
+    public StartupResult Startup()
+    {
+        return peer.Startup();
+    }
+
+    protected virtual void Destroy()
     {
         peer?.Destroy();
         OnShutdown();
@@ -67,12 +74,12 @@ public class BaseClient : MonoBehaviour
         }
     }
 
-    private void Awake()
+    protected virtual void Awake()
     {
         Initialize();
     }
 
-    private void OnDestroy()
+    protected virtual void OnDestroy()
     {
         Destroy();
     }
@@ -87,7 +94,7 @@ public class BaseClient : MonoBehaviour
             while (peer.HasReceived(out BitStream bitStream, out ulong guid, out int packet_size))
             {
                 DefaultMessageIDTypes packet_id = (DefaultMessageIDTypes)bitStream.ReadByte();
-
+ 
                 if (packet_id < DefaultMessageIDTypes.ID_USER_PACKET_ENUM)
                 {
                     switch (packet_id)
@@ -165,6 +172,11 @@ public class BaseClient : MonoBehaviour
                             peer.Shutdown();
                             OnDisconnected(DisconnectReason.ConnectionRecently);
                             break;
+
+                        case DefaultMessageIDTypes.ID_UNCONNECTED_PONG:
+                            bitStream.ResetReadPointer();
+                            OnSerializeData(bitStream, packet_size);
+                            break;
                     }
                 }
                 else if (packet_id >= DefaultMessageIDTypes.ID_USER_PACKET_ENUM)
@@ -179,9 +191,12 @@ public class BaseClient : MonoBehaviour
     /// <summary>
     /// Sending data from a bitstream to server using priorities, reliability, and a channel
     /// </summary>
-    public void SendToServer(BitStream stream, PacketPriority priority = PacketPriority.IMMEDIATE_PRIORITY, PacketReliability reliability = PacketReliability.RELIABLE, byte channel = 0)
+    public byte SendToServer(BitStream stream, PacketPriority priority = PacketPriority.IMMEDIATE_PRIORITY, PacketReliability reliability = PacketReliability.RELIABLE, byte channel = 0)
     {
-        peer.SendToServer(stream, priority, reliability, channel);
+        if (!peer.IsActive())
+            return 0;
+
+        return peer.SendToServer(stream, priority, reliability, channel);
     }
 
     /// <summary>
@@ -235,6 +250,11 @@ public class BaseClient : MonoBehaviour
     public ConnectionState GetConnectionState(ulong guid)
     {
         return peer.GetConnectionState(guid);
+    }
+
+    public bool Ping(string address, ushort port, bool onlyReplyOnAcceptingConnections = false)
+    {
+        return peer.Ping(address, port, onlyReplyOnAcceptingConnections);
     }
 
     public virtual void OnInitialized() { }
