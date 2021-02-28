@@ -141,15 +141,6 @@ public unsafe class RakPeer_Native
 
     [DllImport(DLL_NAME)]
     public static extern bool NET_Ping(IntPtr instance_ptr, string address, ushort port, bool onlyReplyOnAcceptingConnections = false);
-
-
-    /* PLUGINS FEATURE */
-
-    [DllImport(DLL_NAME)]
-    public static extern void NET_AttachPlugin(IntPtr instance_ptr, IntPtr plugin_ptr);
-
-    [DllImport(DLL_NAME)]
-    public static extern void NET_DetachPlugin(IntPtr instance_ptr, IntPtr plugin_ptr);
 }
 
 public enum PeerType
@@ -170,6 +161,11 @@ public class RakPeer : IDisposable
     public RakPeer()
     {
         pointer = RakPeer_Native.NET_Create();
+    }
+
+    public bool Exists()
+    {
+        return pointer != IntPtr.Zero;
     }
 
     #region Disposing
@@ -209,6 +205,10 @@ public class RakPeer : IDisposable
 
     public StartupResult Startup()
     {
+        if (pointer == IntPtr.Zero)
+        {
+            return StartupResult.FAILED_TO_CREATE_NETWORK_THREAD;
+        }
         return RakPeer_Native.NET_Startup(pointer);
     }
 
@@ -216,6 +216,10 @@ public class RakPeer : IDisposable
 
     public StartupResult StartServer(string address, ushort port, ushort max_connections = 32, bool insecure = false)
     {
+        if (pointer == IntPtr.Zero)
+        {
+            return StartupResult.FAILED_TO_CREATE_NETWORK_THREAD;
+        }
         StartupResult = RakPeer_Native.NET_StartServer(pointer, address, port, max_connections, insecure);
 
         if (StartupResult == StartupResult.RAKNET_STARTED)
@@ -229,16 +233,28 @@ public class RakPeer : IDisposable
 
     public void SetMaxConnections(ushort max_connections)
     {
+        if (pointer == IntPtr.Zero)
+        {
+            return;
+        }
         RakPeer_Native.NET_SetMaxConnections(pointer, max_connections);
     }
 
     public void SetPassword(string password)
     {
+        if (pointer == IntPtr.Zero)
+        {
+            return;
+        }
         RakPeer_Native.NET_SetPassword(pointer, password);
     }
 
     public bool HasPassword()
     {
+        if (pointer == IntPtr.Zero)
+        {
+            return false;
+        }
         return RakPeer_Native.NET_HasPassword(pointer);
     }
 
@@ -246,6 +262,10 @@ public class RakPeer : IDisposable
 
     public ConnectionAttemptResult StartClient(string address, ushort port, string password = "", short attempts = 10)
     {
+        if (pointer == IntPtr.Zero)
+        {
+            return ConnectionAttemptResult.INVALID_CONNECT_PARAMETER;
+        }
         ConnectionAttemptResult = RakPeer_Native.NET_StartClient(pointer, address, port, password, attempts);
 
         if (ConnectionAttemptResult == ConnectionAttemptResult.CONNECTION_ATTEMPT_STARTED)
@@ -271,7 +291,7 @@ public class RakPeer : IDisposable
 
     public void SetLimitBandwidth(uint bytesPerSecond)
     {
-        if (Type != PeerType.Server)
+        if (Type != PeerType.Server || pointer == IntPtr.Zero)
             return;
 
         RakPeer_Native.NET_LimitBandwidth(pointer, bytesPerSecond * 8);
@@ -279,52 +299,87 @@ public class RakPeer : IDisposable
 
     public void SetLimitIPConnectionFrequency(bool value)
     {
+        if (pointer == IntPtr.Zero)
+        {
+            return;
+        }
         RakPeer_Native.NET_SetLimitIPConnectionFrequency(pointer, value);
     }
 
     public void AddBanIP(string address, int seconds = 60)
     {
+        if (pointer == IntPtr.Zero)
+        {
+            return;
+        }
         RakPeer_Native.NET_AddBanIP(pointer, address, seconds);
     }
 
     public void RemoveBanIP(string address)
     {
+        if (pointer == IntPtr.Zero)
+        {
+            return;
+        }
         RakPeer_Native.NET_RemoveBanIP(pointer, address);
     }
 
     public bool IsBannedIP(string address)
     {
+        if (pointer == IntPtr.Zero)
+        {
+            return false;
+        }
         return RakPeer_Native.NET_IsBannedIP(pointer, address);
     }
 
     public ushort NumberOfConnections()
     {
+        if (pointer == IntPtr.Zero)
+        {
+            return 0;
+        }
         return RakPeer_Native.NET_NumberOfConnections(pointer);
     }
 
     public ulong GetGUIDFromIndex(uint index)
     {
+        if (pointer == IntPtr.Zero)
+        {
+            return 0;
+        }
         return RakPeer_Native.NET_GetGUIDFromIndex(pointer, index);
     }
 
     public uint GetIndexFromGUID(ulong guid)
     {
+        if (pointer == IntPtr.Zero)
+        {
+            return 0;
+        }
         return RakPeer_Native.NET_GetIndexFromGUID(pointer, guid);
     }
 
     public uint GetMaximumConnections()
     {
+        if (pointer == IntPtr.Zero)
+        {
+            return 0;
+        }
         return RakPeer_Native.NET_GetMaximumConnections(pointer);
     }
 
     public void CloseConnection(ulong guid, bool send_disconnect_notification = true)
     {
+        if(pointer == IntPtr.Zero)
+        {
+            return;
+        }
         RakPeer_Native.NET_CloseConnection(pointer, guid, send_disconnect_notification);
     }
 
     public bool IsActive()
     {
-
         if (pointer == IntPtr.Zero)
         {
             return false;
@@ -341,7 +396,8 @@ public class RakPeer : IDisposable
         _bitStream = bitStream;
         guid = 0;
         packet_size = 0;
-        if (RakPeer_Native.NET_Receive(pointer))
+
+        if (pointer != IntPtr.Zero && RakPeer_Native.NET_Receive(pointer))
         {
             packet_ptr = RakPeer_Native.NET_Packet(pointer, ref guid, ref packet_size);
             if (packet_ptr != IntPtr.Zero && _bitStream != null && _bitStream.pointer != IntPtr.Zero)
@@ -437,21 +493,37 @@ public class RakPeer : IDisposable
 
     public ulong GetMyGUID()
     {
+        if (pointer == IntPtr.Zero)
+        {
+            return 0;
+        }
         return RakPeer_Native.NET_MyGUID(pointer);
     }
 
     public int GetAveragePing(ulong guid = 0)
     {
+        if (pointer == IntPtr.Zero)
+        {
+            return 0;
+        }
         return RakPeer_Native.NET_GetAveragePing(pointer, guid);
     }
 
     public int GetLastPing(ulong guid = 0)
     {
+        if (pointer == IntPtr.Zero)
+        {
+            return 0;
+        }
         return RakPeer_Native.NET_GetLastPing(pointer, guid);
     }
 
     public int GetLowestPing(ulong guid = 0)
     {
+        if (pointer == IntPtr.Zero)
+        {
+            return 0;
+        }
         return RakPeer_Native.NET_GetLowestPing(pointer, guid);
     }
 
@@ -474,27 +546,48 @@ public class RakPeer : IDisposable
 
     public ushort GetPort(ulong guid = 0)
     {
+        if (pointer == IntPtr.Zero)
+        {
+            return 0;
+        }
         return RakPeer_Native.NET_GetPort(pointer, guid);
     }
 
     public ulong GetStatisticsLastSecond(uint index, RNSPerSecondMetrics metrics)
     {
+        if (pointer == IntPtr.Zero)
+        {
+            return 0;
+        }
         return RakPeer_Native.NET_GetStatisticsLastSeconds(pointer, index, metrics);
     }
 
     public ulong GetStatisticsTotal(uint index, RNSPerSecondMetrics metrics)
     {
+        if (pointer == IntPtr.Zero)
+        {
+            return 0;
+        }
         return RakPeer_Native.NET_GetStatisticsTotal(pointer, index, metrics);
     }
 
     public bool GetStatisticsFull(uint index, out RakNetStatistics _statistics)
     {
         _statistics = new RakNetStatistics();
+
+        if (pointer == IntPtr.Zero)
+        {
+            return false;
+        }
+
         return RakPeer_Native.NET_Statistics(pointer, index, ref _statistics);
     }
 
     public ConnectionState GetConnectionState(ulong guid)
     {
+        if (pointer == IntPtr.Zero)
+            return ConnectionState.IS_NOT_CONNECTED;
+
         return RakPeer_Native.NET_ConnectionState(pointer, guid);
     }
 
