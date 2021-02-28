@@ -1,6 +1,4 @@
-using System.Net.Sockets;
-using System.Text;
-using UnityEngine;
+﻿using UnityEngine;
 
 /// <summary>
 /// The base class of the server with basic functionality
@@ -16,6 +14,9 @@ public class BaseServer : MonoBehaviour
         if (peer == null)
         {
             peer = new RakPeer();
+        }
+        if (peer != null && peer.Exists())
+        {
             OnInitialized();
         }
     }
@@ -209,7 +210,6 @@ public class BaseServer : MonoBehaviour
     /// </summary>
     /// <param name="guid">client GUID</param>
     /// <param name="send_disconnect_notification">Tell the client that the server is closing the connection</param>
-    /// <param name="text">reason</param>
     public void CloseConnection(ulong guid, bool send_disconnect_notification = true)
     {
         peer.CloseConnection(guid, send_disconnect_notification);
@@ -218,34 +218,48 @@ public class BaseServer : MonoBehaviour
     /// <summary>
     /// Sending data from a bitstream to a client using priorities, reliability, and a channel
     /// </summary>
-    public void SendToClient(BitStream stream, ulong guid, PacketPriority priority = PacketPriority.IMMEDIATE_PRIORITY, PacketReliability reliability = PacketReliability.RELIABLE, byte channel = 0)
+    /// <param name="stream">Bitstream from which to send data</param>
+    /// <param name="guid">Client guid to which data is sent</param>
+    /// <param name="priority">Packet priority</param>
+    /// <param name="reliability">Packet Reliability</param>
+    /// <param name="channel">Channel number through which data will be sent (32 channels available)</param>
+    public byte SendToClient(BitStream stream, ulong guid, PacketPriority priority = PacketPriority.IMMEDIATE_PRIORITY, PacketReliability reliability = PacketReliability.RELIABLE, byte channel = 0)
     {
         if (!peer.IsActive())
-            return;
+            return 0;
 
-        peer.SendToClient(stream, guid, priority, reliability, channel);
+        return peer.SendToClient(stream, guid, priority, reliability, channel);
     }
 
     /// <summary>
     /// Sending data from a bitstream to all clients using priorities, reliability, and a channel
     /// </summary>
-    public void SendToAll(BitStream stream, PacketPriority priority = PacketPriority.IMMEDIATE_PRIORITY, PacketReliability reliability = PacketReliability.RELIABLE, byte channel = 0)
+    /// <param name="stream">Bitstream from which to send data</param>
+    /// <param name="priority">Packet priority</param>
+    /// <param name="reliability">Packet Reliability</param>
+    /// <param name="channel">Channel number through which data will be sent (32 channels available)</param>
+    public byte SendToAll(BitStream stream, PacketPriority priority = PacketPriority.IMMEDIATE_PRIORITY, PacketReliability reliability = PacketReliability.RELIABLE, byte channel = 0)
     {
         if (!peer.IsActive())
-            return;
+            return 0;
 
-        peer.SendToAll(stream, priority, reliability, channel);
+        return peer.SendToAll(stream, priority, reliability, channel);
     }
 
     /// <summary>
     /// Sending data from the bitstream to all clients ignoring the specified client guid using priority, reliability and channel
     /// </summary>
-    public void SendToAllIgnore(BitStream stream, ulong ignore_guid, PacketPriority priority = PacketPriority.IMMEDIATE_PRIORITY, PacketReliability reliability = PacketReliability.RELIABLE, byte channel = 0)
+    /// <param name="stream">Bitstream from which to send data</param>
+    /// <param name="ignore_guid">client guid to ignore</param>
+    /// <param name="priority">Packet priority</param>
+    /// <param name="reliability">Packet Reliability</param>
+    /// <param name="channel">Channel number through which data will be sent (32 channels available)</param>
+    public byte SendToAllIgnore(BitStream stream, ulong ignore_guid, PacketPriority priority = PacketPriority.IMMEDIATE_PRIORITY, PacketReliability reliability = PacketReliability.RELIABLE, byte channel = 0)
     {
         if (!peer.IsActive())
-            return;
+            return 0;
 
-        peer.SendToAllIgnore(stream, ignore_guid, priority, reliability, channel);
+        return peer.SendToAllIgnore(stream, ignore_guid, priority, reliability, channel);
     }
 
     /// <summary>
