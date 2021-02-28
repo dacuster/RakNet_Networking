@@ -82,7 +82,7 @@ public class SampleServer : BaseServer
                 Clients.Add(guid, new ClientData(guid, bitStream.ReadString()));
 
                 /* we inform the client that his data is accepted, we send it via a reliable channel */
-				using (PooledBitStream bsIn = BitStreamPool.GetBitStream())
+		using (PooledBitStream bsIn = BitStreamPool.GetBitStream())
                 {
                     //be sure to reset the bitstream! If you do not do this the old recorded data will be sent
                     bsIn.Reset();
@@ -93,9 +93,9 @@ public class SampleServer : BaseServer
                     //As an example, we will send the text to the client in the load
                     bsIn.Write("RakNet top... SosiPisos");
 
-					//we send data from bitstream to the client using its unique guid
-					SendToClient(bitStream, guid, PacketPriority.IMMEDIATE_PRIORITY, PacketReliability.RELIABLE, 0);
-				}
+		    //we send data from bitstream to the client using its unique guid
+		    SendToClient(bitStream, guid, PacketPriority.IMMEDIATE_PRIORITY, PacketReliability.RELIABLE, 0);
+		}
                 break;
         }
     }
