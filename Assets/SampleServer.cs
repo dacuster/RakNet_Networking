@@ -82,16 +82,16 @@ public class SampleServer : BaseServer
                 Clients.Add(guid, new ClientData(guid, bitStream.ReadString()));
 
                 /* we inform the client that his data is accepted, we send it via a reliable channel */
-				using (PooledBitStream bitStream = BitStreamPool.GetBitStream())
+				using (PooledBitStream bsIn = BitStreamPool.GetBitStream())
                 {
-					//be sure to reset the bitstream! If you do not do this the old recorded data will be sent
-					bitStream.Reset();
+                    //be sure to reset the bitstream! If you do not do this the old recorded data will be sent
+                    bsIn.Reset();
 
-					//Write the packet id as a byte so that the client knows how to process the packet
-					bitStream.Write((byte)CustomIDs.CLIENT_DATA_ACCEPTED);
+                    //Write the packet id as a byte so that the client knows how to process the packet
+                    bsIn.Write((byte)CustomIDs.CLIENT_DATA_ACCEPTED);
 
-					//As an example, we will send the text to the client in the load
-					bitStream.Write("RakNet top... SosiPisos");
+                    //As an example, we will send the text to the client in the load
+                    bsIn.Write("RakNet top... SosiPisos");
 
 					//we send data from bitstream to the client using its unique guid
 					SendToClient(bitStream, guid, PacketPriority.IMMEDIATE_PRIORITY, PacketReliability.RELIABLE, 0);
