@@ -1,4 +1,4 @@
-![Alt-текст](https://raw.githubusercontent.com/ep1s0de3/RakNet_Networking_2/main/raknet.jpg "Ох ебать!")
+![Alt-текст](https://raw.githubusercontent.com/ep1s0de3/RakNet_Networking/main/raknet.jpg "Ох ебать!")
 This is an re-writted version of the wrapper for the native library of the RakNet network engine.
 
 [Telegram](https://t.me/uraknet)
