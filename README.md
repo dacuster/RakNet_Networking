@@ -1,4 +1,4 @@
-![Alt-текст](https://raw.githubusercontent.com/ep1s0de3/RakNet_Networking/main/raknet.jpg "Ох ебать!")
+![Alt-текст](https://raw.githubusercontent.com/ep1s0de3/RakNet_Networking/stable/raknet.jpg "Ох ебать!")
 This is an re-writted version of the wrapper for the native library of the RakNet network engine.
 
 [Telegram](https://t.me/uraknet)
@@ -18,13 +18,13 @@ See SampleClient.cs and SampleServer.cs
 - Added: Anti-DDos ( ***Restriction of connection from same address for some time*** )
 
 # Writing own Client/Server
->You can use and modify the base scripts for yourself by adding your own logic, but I strongly recommend inheriting from the base classes (BaseClient, BaseServer, BitStream) and overriding the virtual methods in your classes. Examples of inheritance and redefinition can be [found here](https://github.com/ep1s0de3/RakNet_Networking_2/blob/main/Assets/SampleClient.cs) and [here](https://github.com/ep1s0de3/RakNet_Networking_2/blob/main/Assets/SampleServer.cs)
+>You can use and modify the base scripts for yourself by adding your own logic, but I strongly recommend inheriting from the base classes (BaseClient, BaseServer, BitStream) and overriding the virtual methods in your classes. Examples of inheritance and redefinition can be [found here](https://github.com/ep1s0de3/RakNet_Networking_2/blob/stable/Assets/SampleClient.cs) and [here](https://github.com/ep1s0de3/RakNet_Networking_2/blob/stable/Assets/SampleServer.cs)
 
 # Query
 ## Quering data from server
 >To request information about the server, just send a UDP packet with the header 'RakNetQuery' to server
 
->See [Query Sample](https://github.com/ep1s0de3/RakNet_Networking_2/blob/main/Assets/RakQuerySample.cs)
+>See [Query Sample](https://github.com/ep1s0de3/RakNet_Networking_2/blob/stable/Assets/RakQuerySample.cs)
 
 >If the server-side response data is not specified, the server responded with the text message "RakNet Query Response is empty"
 
